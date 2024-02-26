@@ -30,4 +30,4 @@ for file in os.listdir("./cogs"):
         bot.load_extension(f"cogs.{file[:-3]}")
 
 # Запускается бот с помощью метода run, передавая ему токен для авторизации.
-bot.run("MTE0ODI0MDc0NTQ1OTg5NjM5MA.G1rCac.V5teZb-TjjzWv2-Gem56vBHFcZ4V3ICFtdRns4")
+bot.run()
