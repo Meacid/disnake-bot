@@ -143,7 +143,7 @@ class Profile(commands.Cog):
             embed.add_field(name="> Совместный онлайн", value=f"```{voice_hours}ч, {voice_minutes}м   ```", inline=True)
             embed.set_thumbnail(url=self.member.display_avatar.url)
 
-            if user[4]:  # If banner exists
+            if user[4]:  
                 embed.set_image(url=user[4])
 
             view = disnake.ui.View()
