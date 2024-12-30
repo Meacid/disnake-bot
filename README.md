@@ -1,2 +1,2 @@
-# disnake-bot
-disnake-bot((economy and ai)
+# disnake-bot-Economy
+disnake-bot(Economy and AI (gemini)
