@@ -12,12 +12,12 @@ class Coinflip(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.db = UsersDataBase()
-        self.lock = asyncio.Lock()  # Используйте asyncio.Lock() для предотвращения race conditions
+        self.lock = asyncio.Lock()  
 
     @commands.slash_command(name='coinflip', description='Коінфліп')
     async def coinflip(self, inter, сумма: int = commands.Param(description='Виберіть кількість монет', gt=50, le=50000)):
         await self.db.create_table()
-        member = inter.author  # Нет необходимости хранить member как атрибут класса
+        member = inter.author  
         await self.db.add_user(member)
 
         user = await self.db.get_user(member)
@@ -44,14 +44,14 @@ class Coinflip(commands.Cog):
 
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
-        async with self.lock:  # Используйте lock для синхронизации доступа к базе данных
+        async with self.lock:  
             if inter.component.custom_id in ["coinflip_or", "coinflip_reshka"]:
-                # Проверяем, что кнопка нажата тем же пользователем, который запустил команду
+                
                 original_message = await inter.original_message()
                 try:
                     mentioned_user_id = int(original_message.embeds[0].description.split(" ")[0][2:-1])
                 except (IndexError, ValueError):
-                    return  # Не удалось определить пользователя из исходного сообщения
+                    return  
 
                 if inter.author.id != mentioned_user_id:
                     await inter.response.send_message("Ви не можете грати в цю гру.", ephemeral=True)
@@ -59,7 +59,7 @@ class Coinflip(commands.Cog):
 
                 сторона = inter.component.label
 
-                await inter.response.defer()  # Используйте defer(), чтобы избежать ошибки "Interaction timed out"
+                await inter.response.defer() 
 
                 gif_embed = disnake.Embed(color=0x2F3136)
                 gif_embed.set_image(url="https://media.tenor.com/-Ty-f7Ld7skAAAAC/anime-coinflip.gif")
@@ -68,7 +68,7 @@ class Coinflip(commands.Cog):
 
                 await asyncio.sleep(5)
 
-                bot_choice = random.choice(["Орел", "Решка"])  # Убрал "Bro" и "vodka"
+                bot_choice = random.choice(["Орел", "Решка"])  
                 result_embed = disnake.Embed(color=0x2F3136)
 
                 if сторона == bot_choice:
@@ -77,7 +77,7 @@ class Coinflip(commands.Cog):
                     await self.db.add_transaction(inter.author.id, self.сумма, "Виграш у коінфліп")
                 else:
                     field_value = f'Ви програли: **{self.сумма}** {emoji}\n '
-                    await self.db.update_money(inter.author, -self.сумма)  # Используйте inter.author
+                    await self.db.update_money(inter.author, -self.сумма)  
                     await self.db.add_transaction(inter.author.id, -self.сумма, "Проіграш в коінфліп")
 
                 server_avatar_url = inter.guild.icon.url if inter.guild.icon else None
