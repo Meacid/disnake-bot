@@ -1,2 +1,2 @@
 # disnake-bot
-disnake-bot((economy)
+disnake-bot((economy and ai)
