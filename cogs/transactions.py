@@ -70,8 +70,7 @@ class Transactions(commands.Cog):
         await view.update_button()
         await interaction.response.send_message(embed=embeds[0], view=view, ephemeral=True)
 
-    # Сделаем фейковые методы для добавления транзакций.
-    # Их можно удалить, после внедрения данного кода, в вашего бота
+   
     @commands.slash_command(name='add_transaction', description="Добавить транзакцию")
     async def add_transaction(self, interaction: disnake.CommandInteraction):
         await self.db_users.add_transaction(
