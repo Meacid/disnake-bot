@@ -16,10 +16,10 @@ class Roulette(commands.Cog):
             'зеленый': {'emoji': '🟢', 'multiplier': 15, 'chance': 0.15, 'numbers': [0]}
         }
         self.streak_multipliers = {
-            2: 1.2,  # 20% бонус за 2 победы подряд
-            3: 1.5,  # 50% бонус за 3 победы подряд
-            4: 2.0,  # 100% бонус за 4 победы подряд
-            5: 3.0   # 200% бонус за 5 побед подряд
+            2: 1.2,  
+            3: 1.5,  
+            4: 2.0, 
+            5: 3.0   
         }
         self.user_streaks = {}
 
@@ -45,17 +45,17 @@ class Roulette(commands.Cog):
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return
 
-        # Создаем начальный эмбед
+        
         embed = disnake.Embed(color=0x2F3136)
         server_avatar_url = interaction.guild.icon.url if interaction.guild.icon else None
         embed.set_author(name="Cat | Рулетка", icon_url=server_avatar_url)
         embed.set_thumbnail(url=interaction.author.display_avatar.url)
 
-        # Отправляем начальное сообщение
+        
         await interaction.response.send_message(embed=embed)
         message = await interaction.original_message()
 
-        # Анимация вращения с числами
+        
         for _ in range(3):
             number = random.randint(0, 36)
             color = next(color for color, data in self.colors.items() if number in data['numbers'])
@@ -70,7 +70,7 @@ class Roulette(commands.Cog):
             await message.edit(embed=embed)
             await asyncio.sleep(0.7)
 
-        # Определяем результат
+        
         result = random.random()
         if result < self.colors['зеленый']['chance']:
             winning_color = 'зеленый'
@@ -82,15 +82,15 @@ class Roulette(commands.Cog):
             winning_color = 'черный'
             winning_number = random.choice(self.colors['черный']['numbers'])
 
-        # Проверяем выигрыш и обновляем статистику
+        
         if winning_color == цвет:
-            # Проверяем и обновляем серию побед
+            
             if member.id not in self.user_streaks:
                 self.user_streaks[member.id] = 1
             else:
                 self.user_streaks[member.id] += 1
 
-            # Применяем множитель за серию побед
+            
             streak = self.user_streaks[member.id]
             streak_multiplier = self.streak_multipliers.get(streak, 1.0)
             
@@ -103,13 +103,13 @@ class Roulette(commands.Cog):
             await self.db.update_money(member, won_amount)
             await self.db.add_transaction(interaction.author.id, won_amount, "Выигрыш в рулетке")
         else:
-            # Сбрасываем серию побед при проигрыше
+            
             self.user_streaks[member.id] = 0
             embed_description = f'> {interaction.author.mention}, вы **проиграли**!\n> Выпало: {self.colors[winning_color]["emoji"]} **{winning_number}**\n> Потеряно: **{ставка}**'
             await self.db.update_money(member, -ставка)
             await self.db.add_transaction(interaction.author.id, -ставка, "Проигрыш в рулетке")
 
-        # Обновляем эмбед с результатом
+        
         embed.description = embed_description
         embed.clear_fields()
         embed.add_field(
