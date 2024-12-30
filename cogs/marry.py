@@ -56,20 +56,20 @@ class Marry(commands.Cog):
 
     @commands.slash_command(name="divorce", description='Розірвати стосунки')
     async def divorce(self, inter):
-        # Fetch member_id from the database
+        
         member_id = await self.marry_db.get_user(inter.author)
 
-        # Check if member_id is None
+        
         if member_id is None:
             await inter.response.send_message("No relationship found for you.")
             return
 
-        # Check if member_id has at least two elements
+        
         if len(member_id) < 2:
             await inter.response.send_message("Invalid relationship data.")
             return
 
-        # Determine the other member in the relationship
+        
         if inter.author.id == member_id[0]:
             member2_id = member_id[1]
         elif inter.author.id == member_id[1]:
@@ -78,23 +78,23 @@ class Marry(commands.Cog):
             await inter.response.send_message("You are not in a relationship.")
             return
 
-        # Fetch member objects
+        
         member1 = inter.guild.get_member(inter.author.id)
         member2 = inter.guild.get_member(member2_id)
         if member1 is None or member2 is None:
             await inter.response.send_message("Could not find one or both members.")
             return
 
-        # Get the role object
+        
         role = disnake.utils.get(inter.guild.roles, id=1229309971641143336)
         if role is not None:
             await member1.remove_roles(role)
             await member2.remove_roles(role)
 
-        # Remove relationship from the database
+        
         await self.marry_db.remove_user(inter.author)
 
-        # Send a response to the user
+        
         embed = disnake.Embed(color=0x2F3136)
         server_avatar_url = inter.guild.icon.url if inter.guild.icon else None
         embed.set_author(name="Cat | Divorce", icon_url=server_avatar_url)
@@ -154,14 +154,14 @@ class Marry(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: disnake.Member, before: disnake.VoiceState, after: disnake.VoiceState):
-        # Check if the user joined the specific voice channel
+        
         if after.channel and after.channel.id == 1228353476002582579:
-            # Fetch user data from the database
+            
             user_data = await self.marry_db.get_user(member)
             if user_data:
                 partner_id = user_data[1]
                 room_name = user_data[5] if user_data[5] else 'я партнер'
-                # Fetch partner member object
+                
                 partner = member.guild.get_member(partner_id)
                 if partner:
                     category = member.guild.get_channel(1228353273153720493)
@@ -170,22 +170,22 @@ class Marry(commands.Cog):
                         member: disnake.PermissionOverwrite(connect=True),
                         partner: disnake.PermissionOverwrite(connect=True)
                     }
-                    # Determine the channel name
+                    
                     if room_name != 'я партнер':
                         channel_name = room_name
                     else:
                         channel_name = f"{member.display_name} {room_name} {partner.display_name}"
                     private_channel = await category.create_voice_channel(name=channel_name, overwrites=overwrites)
-                    # Move the member to the private channel
+                    
                     await member.move_to(private_channel)
                     
                     self.temp_channels[private_channel.id] = private_channel
 
-        # Check if the user left a voice channel
+        
         if before.channel and before.channel.id in self.temp_channels:
-            # Get the channel object
+            
             channel = member.guild.get_channel(before.channel.id)
-            # If the channel is empty, delete it
+            
             if channel and len(channel.members) == 0:
                 await channel.delete()
                 del self.temp_channels[before.channel.id]
